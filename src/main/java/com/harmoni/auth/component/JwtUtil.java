@@ -3,9 +3,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.io.Decoders;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.util.Date;
 
@@ -13,24 +12,27 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET_KEY = "yourSuperSecretKeyForJWTGenerationUpdateThis";
     private static final long EXPIRATION_TIME = 86400000; // 1 day
 
-    private final SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_KEY));
+    @Value("${harmoni.auth.jwt.secret}")
+    private String secretKey;
+
+    @Value("${harmoni.auth.jwt.expired.time}")
+    private long expiredTime;
 
     public String generateToken(String username) {
         Instant now = Instant.now();
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(Date.from(now))
-                .expiration(Date.from(now.plusMillis(EXPIRATION_TIME)))
-                .signWith(key)
+                .expiration(Date.from(now.plusMillis(expiredTime)))
+                .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)))
                 .compact();
     }
 
     public String extractUsername(String token) {
         return Jwts.parser()
-                .verifyWith(key)
+                .verifyWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)))
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
@@ -43,7 +45,7 @@ public class JwtUtil {
 
     private boolean isTokenExpired(String token) {
         return Jwts.parser()
-                .verifyWith(key)
+                .verifyWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)))
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()

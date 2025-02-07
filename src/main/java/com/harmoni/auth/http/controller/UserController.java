@@ -3,6 +3,7 @@ package com.harmoni.auth.http.controller;
 import com.harmoni.auth.http.response.RestAPIResponse;
 import com.harmoni.auth.model.dto.UserDto;
 import com.harmoni.auth.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,10 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<RestAPIResponse> register(@RequestBody UserDto userDto) {
+    public ResponseEntity<RestAPIResponse> register(@Valid @RequestBody UserDto userDto) {
 
         int row = userService.create(userDto);
-        log.debug("Row Inserted : {}", row);
+        log.debug("User Created : {}", row);
         RestAPIResponse restAPIResponse = RestAPIResponse.builder()
                 .httpStatus(HttpStatus.CREATED.value())
                 .build();
