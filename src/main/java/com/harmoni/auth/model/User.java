@@ -17,5 +17,4 @@ public class User {
     private boolean enabled;
     private Date createdAt;
     private Date updatedAt;
-
 }

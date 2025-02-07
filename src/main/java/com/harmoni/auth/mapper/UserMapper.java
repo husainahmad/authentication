@@ -8,6 +8,6 @@ public interface UserMapper {
     int insert(User row);
     int updateByPrimaryKey(User row);
     User selectByPrimaryKey(Integer id);
-    User selectByUsernamePassword(String username, String password);
+    User selectByUsername(String username);
     int deleteByPrimaryKey(Integer id);
 }

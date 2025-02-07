@@ -23,28 +23,25 @@
     where id = #{id,jdbcType=BIGINT}
   </select>
 
-  <select id="selectByUsernamePassword" resultMap="BaseResultMap">
+  <select id="selectByUsername" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from users
-    where username = #{username,jdbcType=VARCHAR} and password = #{password,jdbcType=VARCHAR}
+    where username = #{username,jdbcType=VARCHAR}
   </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from users
-    where id = #{id,jdbcType=BIGINT}
+    where id = #{id,jdbcType=INTEGER}
   </delete>
 
   <insert id="insert" parameterType="com.harmoni.auth.model.User">
-    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into users (username, email, password, 
-      enabled, created_at, updated_at
-      )
+    insert into users (username, email, password, enabled)
     values (#{username,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
-      #{enabled,jdbcType=BIT}, #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}
-      )
+      #{enabled,jdbcType=BOOLEAN} )
   </insert>
 
   <update id="updateByPrimaryKey" parameterType="com.harmoni.auth.model.User">
@@ -53,9 +50,8 @@
       email = #{email,jdbcType=VARCHAR},
       password = #{password,jdbcType=VARCHAR},
       enabled = #{enabled,jdbcType=BIT},
-      created_at = #{createdAt,jdbcType=TIMESTAMP},
       updated_at = #{updatedAt,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=BIGINT}
+    where id = #{id,jdbcType=INTEGER}
   </update>
 
 </mapper>
