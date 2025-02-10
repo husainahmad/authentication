@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserRoleKey {
-    private Long userId;
-    private Long roleId;
+    private Integer userId;
+    private Integer roleId;
+    private Role role;
 }

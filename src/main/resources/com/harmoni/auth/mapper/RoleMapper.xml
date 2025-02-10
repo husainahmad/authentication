@@ -3,19 +3,19 @@
 <mapper namespace="com.harmoni.auth.mapper.RoleMapper">
 
   <resultMap id="BaseResultMap" type="com.harmoni.auth.model.Role">
-    <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="name" jdbcType="VARCHAR" property="name" />
+    <id column="role_id" jdbcType="INTEGER" property="id" />
+    <result column="role_name" jdbcType="VARCHAR" property="name" />
   </resultMap>
 
   <sql id="Base_Column_List">
-    id, name, created_at, updated_at, deleted_at
+    role.id as role_id, role.name as role_name
   </sql>
 
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from roles
-    where id = #{id,jdbcType=INTEGER}
+    from roles role
+    where role.id = #{id,jdbcType=INTEGER}
   </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
@@ -27,18 +27,13 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into roles (name, created_at, updated_at, 
-      deleted_at)
-    values (#{name,jdbcType=CHAR}, #{createdAt,jdbcType=TIMESTAMP}, #{updatedAt,jdbcType=TIMESTAMP}, 
-      #{deletedAt,jdbcType=TIMESTAMP})
+    insert into roles (name)
+    values (#{name,jdbcType=CHAR})
   </insert>
 
   <update id="updateByPrimaryKey" parameterType="com.harmoni.auth.model.Role">
     update roles
-    set name = #{name,jdbcType=CHAR},
-      created_at = #{createdAt,jdbcType=TIMESTAMP},
-      updated_at = #{updatedAt,jdbcType=TIMESTAMP},
-      deleted_at = #{deletedAt,jdbcType=TIMESTAMP}
+    set name = #{name,jdbcType=CHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

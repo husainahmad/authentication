@@ -2,7 +2,7 @@ package com.harmoni.auth.http.controller;
 
 import com.harmoni.auth.http.response.RestAPIResponse;
 import com.harmoni.auth.model.dto.LoginDto;
-import com.harmoni.auth.service.AuthService;
+import com.harmoni.auth.bussines.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

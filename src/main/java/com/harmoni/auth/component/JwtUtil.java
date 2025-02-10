@@ -1,4 +1,5 @@
 package com.harmoni.auth.component;
+import com.harmoni.auth.model.UserRoleKey;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.io.Decoders;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Component
@@ -20,11 +22,12 @@ public class JwtUtil {
     @Value("${harmoni.auth.jwt.expired.time}")
     private long expiredTime;
 
-    public String generateToken(String username) {
+    public String generateToken(String username, List<UserRoleKey> roles) {
         Instant now = Instant.now();
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(Date.from(now))
+                .claim("roles", roles)
                 .expiration(Date.from(now.plusMillis(expiredTime)))
                 .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)))
                 .compact();

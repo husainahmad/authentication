@@ -1,8 +1,8 @@
 package com.harmoni.auth.http.controller;
 
+import com.harmoni.auth.bussines.service.RegistrationService;
 import com.harmoni.auth.http.response.RestAPIResponse;
 import com.harmoni.auth.model.dto.UserDto;
-import com.harmoni.auth.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class UserController {
 
-    private final UserService userService;
+    private final RegistrationService registrationService;
 
     @PostMapping("/register")
     public ResponseEntity<RestAPIResponse> register(@Valid @RequestBody UserDto userDto) {
 
-        int row = userService.create(userDto);
+        int row = registrationService.register(userDto);
         log.debug("User Created : {}", row);
         RestAPIResponse restAPIResponse = RestAPIResponse.builder()
                 .httpStatus(HttpStatus.CREATED.value())

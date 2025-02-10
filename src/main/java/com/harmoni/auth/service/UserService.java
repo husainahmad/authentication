@@ -1,23 +1,27 @@
 package com.harmoni.auth.service;
 
-import com.harmoni.auth.component.JwtUtil;
+import com.harmoni.auth.exception.BusinessNotFoundRequestException;
 import com.harmoni.auth.mapper.UserMapper;
-import com.harmoni.auth.model.dto.UserDto;
+import com.harmoni.auth.model.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service("userService")
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
 
-    public int create(UserDto userDto) {
-        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        return userMapper.insert(userDto.toUser());
+    public int create(User user) {
+        return userMapper.insert(user);
+    }
+
+    public User selectByUsername(String username) {
+        User user = userMapper.selectByUsername(username);
+        if (user == null) {
+            throw new BusinessNotFoundRequestException("exception.user.username.notFound", null);
+        }
+        return user;
     }
 
 }
