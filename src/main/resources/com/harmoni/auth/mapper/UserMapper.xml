@@ -30,9 +30,9 @@
     where username = #{username,jdbcType=VARCHAR}
   </select>
 
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+  <delete id="deleteByUsername" parameterType="java.lang.String">
     delete from users
-    where id = #{id,jdbcType=INTEGER}
+    where username = #{username,jdbcType=VARCHAR}
   </delete>
 
   <insert id="insert" parameterType="com.harmoni.auth.model.User">

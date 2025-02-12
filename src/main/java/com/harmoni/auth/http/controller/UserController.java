@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/user")
@@ -21,17 +18,34 @@ public class UserController {
 
     private final RegistrationService registrationService;
 
-    @PostMapping("/register")
+    @PostMapping("")
     public ResponseEntity<RestAPIResponse> register(@Valid @RequestBody UserDto userDto) {
-
         int row = registrationService.register(userDto);
         log.debug("User Created : {}", row);
         RestAPIResponse restAPIResponse = RestAPIResponse.builder()
                 .httpStatus(HttpStatus.CREATED.value())
                 .build();
-
         return new ResponseEntity<>(restAPIResponse, HttpStatus.CREATED);
-
     }
 
+    @DeleteMapping("/{username}")
+    public ResponseEntity<RestAPIResponse> deactivate(@PathVariable String username) {
+        int row = registrationService.deactivate(username);
+        log.debug("User Deactivated : {}", row);
+        RestAPIResponse restAPIResponse = RestAPIResponse.builder()
+                .httpStatus(HttpStatus.OK.value())
+                .build();
+        return new ResponseEntity<>(restAPIResponse, HttpStatus.OK);
+    }
+
+    @PutMapping("/{username}")
+    public ResponseEntity<RestAPIResponse> update(@PathVariable String username, @Valid @RequestBody UserDto userDto) {
+        userDto.setUsername(username);
+        int row = registrationService.update(userDto);
+        log.debug("User Updated : {}", row);
+        RestAPIResponse restAPIResponse = RestAPIResponse.builder()
+                .httpStatus(HttpStatus.OK.value())
+                .build();
+        return new ResponseEntity<>(restAPIResponse, HttpStatus.OK);
+    }
 }

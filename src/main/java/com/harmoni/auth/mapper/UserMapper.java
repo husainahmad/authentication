@@ -9,5 +9,5 @@ public interface UserMapper {
     int updateByPrimaryKey(User row);
     User selectByPrimaryKey(Integer id);
     User selectByUsername(String username);
-    int deleteByPrimaryKey(Integer id);
+    int deleteByUsername(String username);
 }

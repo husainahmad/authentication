@@ -1,6 +1,5 @@
 package com.harmoni.auth.service;
 
-import com.harmoni.auth.exception.BusinessNotFoundRequestException;
 import com.harmoni.auth.mapper.UserMapper;
 import com.harmoni.auth.model.User;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +16,17 @@ public class UserService {
     }
 
     public User selectByUsername(String username) {
-        User user = userMapper.selectByUsername(username);
-        if (user == null) {
-            throw new BusinessNotFoundRequestException("exception.user.username.notFound", null);
-        }
-        return user;
+        return userMapper.selectByUsername(username);
     }
+
+    public int deleteByUsername(User user) {
+        return userMapper.deleteByUsername(user.getUsername());
+    }
+
+    public int updateByUsername(User user) {
+        return userMapper.updateByPrimaryKey(user);
+    }
+
+
 
 }
