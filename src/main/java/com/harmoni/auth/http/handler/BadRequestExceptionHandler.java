@@ -15,51 +15,79 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Locale;
 
+/**
+ * Handles HTTP 400 Bad Request exceptions and returns standardized error responses.
+ *
+ * <p>This class provides centralized exception handling for:
+ * <ul>
+ *   <li>{@link BusinessBadRequestException} - for domain-specific validation errors.</li>
+ *   <li>{@link MissingServletRequestParameterException} - for missing required request parameters.</li>
+ * </ul>
+ * </p>
+ *
+ * <p>All responses are returned in a uniform {@link RestAPIResponse} format,
+ * including localized error messages where applicable.</p>
+ */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 @AllArgsConstructor
 @Slf4j
 public class BadRequestExceptionHandler {
+
     private final MessageSource messageSource;
 
+    /**
+     * Handles {@link BusinessBadRequestException} by resolving the message
+     * key to a localized error message and returning it in the response body.
+     *
+     * @param e      the business exception containing message key and arguments
+     * @param locale the client locale used to localize the message
+     * @return a {@link ResponseEntity} with HTTP 400 and error details
+     */
     @ExceptionHandler(BusinessBadRequestException.class)
-    public ResponseEntity<RestAPIResponse>
-            badRequestExceptionHandler(BusinessBadRequestException e, Locale locale) {
-
-        String messageName = e.getMessage();
+    public ResponseEntity<RestAPIResponse> badRequestExceptionHandler(BusinessBadRequestException e, Locale locale) {
+        String messageKey = e.getMessage();
         Object[] args = e.getArgs();
+        String localizedMessage = messageSource.getMessage(messageKey, args, locale);
 
-        String message = messageSource.getMessage(messageName, args, locale);
-
-        RestAPIResponse restAPIResponse = RestAPIResponse.builder()
+        RestAPIResponse response = RestAPIResponse.builder()
                 .httpStatus(HttpStatus.BAD_REQUEST.value())
                 .timeStamp(System.currentTimeMillis())
-                .error(message)
+                .error(localizedMessage)
                 .data(null)
                 .build();
 
-        logAsWarning(message);
-
-        return new ResponseEntity<>(restAPIResponse, HttpStatus.BAD_REQUEST);
+        logAsWarning(localizedMessage);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    private static void logAsWarning(String message) {
-        log.warn("BadRequest: {}", message);
-    }
-
+    /**
+     * Handles {@link MissingServletRequestParameterException} by extracting the exception's message.
+     *
+     * @param e the exception triggered when a required parameter is not provided
+     * @return a {@link ResponseEntity} with HTTP 400 and the error message
+     */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<RestAPIResponse> missingRequiredParam(MissingServletRequestParameterException e) {
-        String messageName = e.getMessage();
+        String errorMessage = e.getMessage();
 
-        RestAPIResponse restAPIResponse = RestAPIResponse.builder()
+        RestAPIResponse response = RestAPIResponse.builder()
                 .httpStatus(HttpStatus.BAD_REQUEST.value())
                 .timeStamp(System.currentTimeMillis())
-                .error(messageName)
+                .error(errorMessage)
                 .data(null)
                 .build();
 
-        logAsWarning(messageName);
+        logAsWarning(errorMessage);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 
-        return new ResponseEntity<>(restAPIResponse, HttpStatus.BAD_REQUEST);
+    /**
+     * Logs a warning for bad request errors.
+     *
+     * @param message the warning message to be logged
+     */
+    private static void logAsWarning(String message) {
+        log.warn("BadRequest: {}", message);
     }
 }

@@ -12,16 +12,30 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Business service responsible for authenticating users and issuing JWT tokens.
+ * <p>
+ * This service validates user credentials, retrieves user roles, and generates
+ * a signed JWT for successful login attempts.
+ * </p>
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserService userService;
     private final UserRoleService userRoleService;
-
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Authenticates a user by verifying username and password, and returns a JWT token if valid.
+     *
+     * @param username the user's username
+     * @param password the raw password to validate
+     * @return a signed JWT token containing the username and user roles
+     * @throws BusinessUnAuthorizedRequestException if the username is not found or password is incorrect
+     */
     public String authenticate(String username, String password) {
         User user = userService.selectByUsername(username);
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
@@ -32,5 +46,4 @@ public class AuthService {
 
         return jwtUtil.generateToken(username, userRoles);
     }
-
 }

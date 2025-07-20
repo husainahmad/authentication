@@ -14,6 +14,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Locale;
 
+/**
+ * Exception handler for business scenarios where no content is returned (HTTP 204).
+ *
+ * <p>This handler captures {@link BusinessNoContentRequestException} and formats it
+ * into a consistent {@link RestAPIResponse} with a 204 status code and localized error message.</p>
+ */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 @Slf4j
@@ -21,14 +27,27 @@ public class NoContentExceptionHandler {
 
     private final MessageSource messageSource;
 
+    /**
+     * Constructor for injecting {@link MessageSource} to support internationalized messages.
+     *
+     * @param messageSource the message source used for resolving localized error messages
+     */
     @Autowired
     public NoContentExceptionHandler(MessageSource messageSource) {
         this.messageSource = messageSource;
     }
 
+    /**
+     * Handles {@link BusinessNoContentRequestException} and constructs a localized error response
+     * with HTTP status 204 (No Content).
+     *
+     * @param e      the thrown business exception
+     * @param locale the client's locale for message translation
+     * @return a {@link ResponseEntity} containing a {@link RestAPIResponse} with a 204 status code
+     */
     @ExceptionHandler(BusinessNoContentRequestException.class)
-    public ResponseEntity<RestAPIResponse>
-            badRequestExceptionHandler(BusinessNoContentRequestException e, Locale locale) {
+    public ResponseEntity<RestAPIResponse> badRequestExceptionHandler(
+            BusinessNoContentRequestException e, Locale locale) {
 
         log.warn("NoContentRequest: ", e);
 

@@ -9,12 +9,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST controller responsible for handling authentication-related endpoints.
+ * <p>
+ * Provides an endpoint for user login and returns a JWT token upon successful authentication.
+ * </p>
+ */
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
+
     private final AuthService authService;
 
+    /**
+     * Authenticates a user using the provided login credentials.
+     *
+     * @param loginDto the login request payload containing username and password
+     * @return a {@link ResponseEntity} containing the {@link RestAPIResponse} with a JWT token on success
+     */
     @PostMapping("/login")
     public ResponseEntity<RestAPIResponse> login(@Valid @RequestBody LoginDto loginDto) {
         RestAPIResponse restAPIResponse = RestAPIResponse.builder()
@@ -22,6 +35,7 @@ public class AuthController {
                 .data(authService.authenticate(loginDto.getUsername(), loginDto.getPassword()))
                 .error(null)
                 .build();
+
         return new ResponseEntity<>(restAPIResponse, HttpStatus.OK);
     }
 }
