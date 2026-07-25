@@ -1,9 +1,11 @@
 package com.harmoni.auth.model.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class LoginDto {
     @NotBlank(message = "{validation.auth.username.NotBlank}")
     private String username;

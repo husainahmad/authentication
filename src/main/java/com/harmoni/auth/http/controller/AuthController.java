@@ -1,5 +1,6 @@
 package com.harmoni.auth.http.controller;
 
+import com.harmoni.auth.http.response.AuthResponse;
 import com.harmoni.auth.http.response.RestAPIResponse;
 import com.harmoni.auth.model.dto.LoginDto;
 import com.harmoni.auth.bussines.service.AuthService;
@@ -33,6 +34,24 @@ public class AuthController {
         RestAPIResponse restAPIResponse = RestAPIResponse.builder()
                 .httpStatus(HttpStatus.OK.value())
                 .data(authService.authenticate(loginDto.getUsername(), loginDto.getPassword()))
+                .error(null)
+                .build();
+
+        return new ResponseEntity<>(restAPIResponse, HttpStatus.OK);
+    }
+
+    /**
+     * Refreshes the access token using a valid refresh token.
+     *
+     * @param refreshToken the refresh token
+     * @return a {@link ResponseEntity} containing the new access and refresh tokens
+     */
+    @PostMapping("/refresh-token")
+    public ResponseEntity<RestAPIResponse> refreshAccessToken(@RequestBody String refreshToken) {
+        AuthResponse authResponse = authService.refreshAccessToken(refreshToken);
+        RestAPIResponse restAPIResponse = RestAPIResponse.builder()
+                .httpStatus(HttpStatus.OK.value())
+                .data(authResponse)
                 .error(null)
                 .build();
 

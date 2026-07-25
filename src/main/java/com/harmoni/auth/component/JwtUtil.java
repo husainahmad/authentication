@@ -23,12 +23,16 @@ import java.util.List;
 public class JwtUtil {
 
     private static final long EXPIRATION_TIME = 86400000; // 1 day (fallback)
+    private static final long REFRESH_EXPIRATION_TIME = 604800000; // 7 days (fallback)
 
     @Value("${harmoni.auth.jwt.secret}")
     private String secretKey;
 
     @Value("${harmoni.auth.jwt.expired.time}")
     private long expiredTime;
+
+    @Value("${harmoni.auth.jwt.refresh.expired.time}")
+    private long refreshExpiredTime;
 
     /**
      * Generates a signed JWT token containing the username and user roles.
@@ -44,6 +48,22 @@ public class JwtUtil {
                 .issuedAt(Date.from(now))
                 .claim("roles", roles)
                 .expiration(Date.from(now.plusMillis(expiredTime)))
+                .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)))
+                .compact();
+    }
+
+    /**
+     * Generates a refresh token for the user.
+     *
+     * @param username the username to include in the token subject
+     * @return a signed refresh token as a String
+     */
+    public String generateRefreshToken(String username) {
+        Instant now = Instant.now();
+        return Jwts.builder()
+                .subject(username)
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plusMillis(refreshExpiredTime)))
                 .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)))
                 .compact();
     }

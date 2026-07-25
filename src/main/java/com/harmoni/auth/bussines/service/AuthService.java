@@ -2,6 +2,7 @@ package com.harmoni.auth.bussines.service;
 
 import com.harmoni.auth.component.JwtUtil;
 import com.harmoni.auth.exception.BusinessUnAuthorizedRequestException;
+import com.harmoni.auth.http.response.AuthResponse;
 import com.harmoni.auth.model.User;
 import com.harmoni.auth.model.UserRoleKey;
 import com.harmoni.auth.service.UserRoleService;
@@ -36,7 +37,7 @@ public class AuthService {
      * @return a signed JWT token containing the username and user roles
      * @throws BusinessUnAuthorizedRequestException if the username is not found or password is incorrect
      */
-    public String authenticate(String username, String password) {
+    public AuthResponse authenticate(String username, String password) {
         User user = userService.selectByUsername(username);
         if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             throw new BusinessUnAuthorizedRequestException("exception.auth.username.password.notFound", null);
@@ -44,6 +45,30 @@ public class AuthService {
 
         List<UserRoleKey> userRoles = userRoleService.selectRolesByUserId(user.getId());
 
-        return jwtUtil.generateToken(username, userRoles);
+        String accessToken = jwtUtil.generateToken(username, userRoles);
+        String refreshToken = jwtUtil.generateRefreshToken(username);
+
+        return new AuthResponse(accessToken, refreshToken);
+    }
+
+    /**
+     * Refreshes the access token using a valid refresh token.
+     *
+     * @param refreshToken the refresh token
+     * @return an {@link AuthResponse} containing the new access and refresh tokens
+     * @throws BusinessUnAuthorizedRequestException if the refresh token is invalid
+     */
+    public AuthResponse refreshAccessToken(String refreshToken) {
+        String username = jwtUtil.extractUsername(refreshToken);
+        User user = userService.selectByUsername(username);
+        if (user == null) {
+            throw new BusinessUnAuthorizedRequestException("exception.auth.refresh.invalid", null);
+        }
+
+        List<UserRoleKey> userRoles = userRoleService.selectRolesByUserId(user.getId());
+        String newAccessToken = jwtUtil.generateToken(username, userRoles);
+        String newRefreshToken = jwtUtil.generateRefreshToken(username);
+
+        return new AuthResponse(newAccessToken, newRefreshToken);
     }
 }
