@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.harmoni.auth.infrastructure.persistence.mybatis.mapper.UserRoleMapper">
+
+  <resultMap id="BaseResultMap" type="com.harmoni.auth.domain.model.UserRoleKey">
+    <id column="user_role_user_id" jdbcType="INTEGER" property="userId" />
+    <id column="user_role_role_id" jdbcType="INTEGER" property="roleId" />
+    <association property="role" javaType="com.harmoni.auth.domain.model.Role">
+      <id column="role_id" jdbcType="INTEGER" property="id" />
+      <result column="role_name" jdbcType="VARCHAR" property="name" />
+    </association>
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    user_role.user_id as user_role_user_id,
+    user_role.role_id as user_role_role_id
+  </sql>
+
+  <delete id="deleteByPrimaryKey" parameterType="com.harmoni.auth.domain.model.UserRoleKey">
+    delete from user_roles
+    where user_id = #{userId,jdbcType=BIGINT}
+    and role_id = #{roleId,jdbcType=BIGINT}
+  </delete>
+
+  <select id="selectRolesByUserId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+      select
+      <include refid="Base_Column_List" />,
+      <include refid="com.harmoni.auth.infrastructure.persistence.mybatis.mapper.RoleMapper.Base_Column_List"/>
+      from user_roles user_role
+      left join roles role
+          on role.id = user_role.role_id
+      where user_id = #{userId,jdbcType=BIGINT}
+  </select>
+
+  <insert id="insert" parameterType="com.harmoni.auth.domain.model.UserRoleKey">
+      insert into user_roles (user_id, role_id)
+      values (#{userId,jdbcType=BIGINT}, #{roleId,jdbcType=BIGINT})
+  </insert>
+
+</mapper>

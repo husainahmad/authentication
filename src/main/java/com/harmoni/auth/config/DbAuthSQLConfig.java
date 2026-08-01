@@ -10,9 +10,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 
 /**
  * Configuration class for setting up the MyBatis SQL session and transaction management
@@ -25,7 +28,7 @@ import javax.sql.DataSource;
  *     <li>A {@link DataSourceTransactionManager} for transaction handling</li>
  * </ul>
  */
-@MapperScan(value = "com.harmoni.auth.mapper")
+@MapperScan(value = "com.harmoni.auth.infrastructure.persistence.mybatis.mapper")
 @Configuration
 public class DbAuthSQLConfig {
 
@@ -59,7 +62,13 @@ public class DbAuthSQLConfig {
     ) throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(authSQLDataSource);
+        sqlSessionFactoryBean.setMapperLocations(resolveMapperLocations());
         return sqlSessionFactoryBean.getObject();
+    }
+
+    private Resource[] resolveMapperLocations() throws IOException {
+        return new PathMatchingResourcePatternResolver()
+                .getResources("classpath*:com/harmoni/auth/**/mapper/*.xml");
     }
 
     /**

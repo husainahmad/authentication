@@ -1,9 +1,9 @@
 package com.harmoni.auth.component;
 
-import com.harmoni.auth.model.UserRoleKey;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.io.Decoders;
+import com.harmoni.auth.domain.model.Role;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -35,17 +35,19 @@ public class JwtUtil {
     private long refreshExpiredTime;
 
     /**
-     * Generates a signed JWT token containing the username and user roles.
+     * Generates a signed JWT token containing the user id, username and user roles.
      *
+     * @param userId  the user id to include as a claim
      * @param username the username to include in the token subject
      * @param roles    the list of roles associated with the user
      * @return a signed JWT token as a String
      */
-    public String generateToken(String username, List<UserRoleKey> roles) {
+    public String generateToken(Integer userId, String username, List<Role> roles) {
         Instant now = Instant.now();
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(Date.from(now))
+                .claim("userId", userId)
                 .claim("roles", roles)
                 .expiration(Date.from(now.plusMillis(expiredTime)))
                 .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)))
@@ -81,6 +83,21 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
+    }
+
+    /**
+     * Extracts the user id from a JWT token.
+     *
+     * @param token the JWT token
+     * @return the user id stored in the "userId" claim
+     */
+    public Integer extractUserId(String token) {
+        return Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("userId", Integer.class);
     }
 
     /**
