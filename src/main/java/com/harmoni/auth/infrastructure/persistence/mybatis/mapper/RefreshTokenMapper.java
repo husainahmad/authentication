@@ -60,12 +60,12 @@ public interface RefreshTokenMapper {
     RefreshToken selectByToken(String token);
 
     /**
-     * Retrieves a {@link RefreshToken} record by its associated username.
+     * Retrieves a {@link RefreshToken} record by its associated user ID.
      *
-     * @param username the username to search for
+     * @param userId the user ID to search for
      * @return the {@link RefreshToken} entity, or {@code null} if not found
      */
-    RefreshToken selectByUsername(String username);
+    RefreshToken selectByUserId(Long userId);
 
     /**
      * Deletes a {@link RefreshToken} record by its token value.

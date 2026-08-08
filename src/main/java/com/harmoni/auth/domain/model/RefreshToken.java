@@ -14,7 +14,7 @@ import lombok.Data;
 public class RefreshToken {
     private Long id;
     private String token;
-    private String username;
+    private Long userId;
     private Instant expiryDate;
 
     /**
@@ -44,7 +44,7 @@ public class RefreshToken {
         return "RefreshToken{" +
                 "id=" + id +
                 ", token='" + token + '\'' +
-                ", username='" + username + '\'' +
+                ", userId=" + userId +
                 ", expiryDate=" + expiryDate +
                 '}';
     }

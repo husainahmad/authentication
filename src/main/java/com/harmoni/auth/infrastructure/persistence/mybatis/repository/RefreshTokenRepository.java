@@ -36,12 +36,12 @@ public interface RefreshTokenRepository {
     RefreshToken findByToken(String token);
 
     /**
-     * Finds a refresh token by username.
+     * Finds a refresh token by user ID.
      *
-     * @param username the username associated with the refresh token
+     * @param userId the user ID associated with the refresh token
      * @return the refresh token if found, null otherwise
      */
-    RefreshToken findByUsername(String username);
+    RefreshToken findByUserId(Long userId);
 
     /**
      * Deletes a refresh token by their ID.

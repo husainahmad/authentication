@@ -51,7 +51,7 @@ public class RefreshTokenUseCaseImpl implements RefreshTokenUseCase {
         }
 
         // Find the user associated with the refresh token
-        var user = userRepository.findByUsername(tokenEntity.getUsername());
+        var user = userRepository.findById(tokenEntity.getUserId());
         if (user == null) {
             throw new AuthenticationException("User not found for refresh token");
         }

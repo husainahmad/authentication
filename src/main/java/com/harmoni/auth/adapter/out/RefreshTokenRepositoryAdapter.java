@@ -36,8 +36,8 @@ public class RefreshTokenRepositoryAdapter implements RefreshTokenRepository {
     }
 
     @Override
-    public RefreshToken findByUsername(String username) {
-        return refreshTokenMapper.selectByUsername(username);
+    public RefreshToken findByUserId(Long userId) {
+        return refreshTokenMapper.selectByUserId(userId);
     }
 
     @Override
