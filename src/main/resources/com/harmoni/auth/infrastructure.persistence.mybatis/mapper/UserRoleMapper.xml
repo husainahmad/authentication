@@ -3,17 +3,27 @@
 <mapper namespace="com.harmoni.auth.infrastructure.persistence.mybatis.mapper.UserRoleMapper">
 
   <resultMap id="BaseResultMap" type="com.harmoni.auth.domain.model.UserRoleKey">
-    <id column="user_role_user_id" jdbcType="INTEGER" property="userId" />
-    <id column="user_role_role_id" jdbcType="INTEGER" property="roleId" />
+    <id column="user_role_id" jdbcType="BIGINT" property="id" />
+    <result column="user_role_user_id" jdbcType="INTEGER" property="userId" />
+    <result column="user_role_role_id" jdbcType="INTEGER" property="roleId" />
+    <result column="user_role_scope_type" jdbcType="VARCHAR" property="scopeType" />
+    <result column="user_role_scope_id" jdbcType="BIGINT" property="scopeId" />
     <association property="role" javaType="com.harmoni.auth.domain.model.Role">
       <id column="role_id" jdbcType="INTEGER" property="id" />
       <result column="role_name" jdbcType="VARCHAR" property="name" />
+      <result column="role_description" jdbcType="VARCHAR" property="description" />
+      <result column="role_scope_type" jdbcType="VARCHAR" property="scopeType" />
+      <result column="role_code" jdbcType="VARCHAR" property="code" />
+      <result column="role_system" jdbcType="BIT" property="system" />
     </association>
   </resultMap>
 
   <sql id="Base_Column_List">
+    user_role.id as user_role_id,
     user_role.user_id as user_role_user_id,
-    user_role.role_id as user_role_role_id
+    user_role.role_id as user_role_role_id,
+    user_role.scope_type as user_role_scope_type,
+    user_role.scope_id as user_role_scope_id
   </sql>
 
   <delete id="deleteByPrimaryKey" parameterType="com.harmoni.auth.domain.model.UserRoleKey">
@@ -29,12 +39,31 @@
       from user_roles user_role
       left join roles role
           on role.id = user_role.role_id
-      where user_id = #{userId,jdbcType=BIGINT}
+      where user_role.user_id = #{userId,jdbcType=BIGINT}
   </select>
 
+  <select id="selectAssignmentsByUserIds" resultMap="BaseResultMap">
+      select
+      <include refid="Base_Column_List" />,
+      <include refid="com.harmoni.auth.infrastructure.persistence.mybatis.mapper.RoleMapper.Base_Column_List"/>
+      from user_roles user_role
+      left join roles role
+          on role.id = user_role.role_id
+      where user_role.user_id in
+      <foreach item="userId" collection="userIds" open="(" separator="," close=")">
+        #{userId,jdbcType=BIGINT}
+      </foreach>
+  </select>
+
+  <delete id="deleteByUserId" parameterType="java.lang.Long">
+    delete from user_roles
+    where user_id = #{userId,jdbcType=BIGINT}
+  </delete>
+
   <insert id="insert" parameterType="com.harmoni.auth.domain.model.UserRoleKey">
-      insert into user_roles (user_id, role_id)
-      values (#{userId,jdbcType=BIGINT}, #{roleId,jdbcType=BIGINT})
+      insert into user_roles (user_id, role_id, scope_type, scope_id)
+      values (#{userId,jdbcType=BIGINT}, #{roleId,jdbcType=BIGINT},
+        #{scopeType,jdbcType=VARCHAR}, #{scopeId,jdbcType=BIGINT})
   </insert>
 
 </mapper>

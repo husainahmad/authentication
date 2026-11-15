@@ -3,10 +3,12 @@ package com.harmoni.auth.adapter.out;
 import com.harmoni.auth.application.port.out.JwtTokenProvider;
 import com.harmoni.auth.component.JwtUtil;
 import com.harmoni.auth.domain.model.Role;
+import com.harmoni.auth.web.dto.AssignmentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Adapter implementing the JwtTokenProvider port.
@@ -20,8 +22,9 @@ public class JwtTokenProviderAdapter implements JwtTokenProvider {
     private final JwtUtil jwtUtil;
 
     @Override
-    public String generateToken(Integer userId, String username, List<Role> roles) {
-        return jwtUtil.generateToken(userId, username, roles);
+    public String generateToken(Integer userId, String username, List<Role> roles,
+                                Set<String> permissions, List<AssignmentDto> scopes) {
+        return jwtUtil.generateToken(userId, username, roles, permissions, scopes);
     }
 
     @Override

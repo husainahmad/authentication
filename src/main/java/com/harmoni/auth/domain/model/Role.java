@@ -17,6 +17,11 @@ import java.util.Set;
 public class Role {
     private Long id;
     private String name;
+    private String description;
+    private String scopeType;
+    private String code;
+    private boolean system;
+    private Integer employeeCount;
     private final Set<Permission> permissions = new HashSet<>();
 
     public Set<Permission> getPermissions() {

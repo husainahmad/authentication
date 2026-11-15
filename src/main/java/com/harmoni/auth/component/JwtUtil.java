@@ -4,6 +4,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.io.Decoders;
 import com.harmoni.auth.domain.model.Role;
+import com.harmoni.auth.web.dto.AssignmentDto;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Utility class for generating, parsing, and validating JSON Web Tokens (JWT) used for authentication.
@@ -37,18 +39,23 @@ public class JwtUtil {
     /**
      * Generates a signed JWT token containing the user id, username and user roles.
      *
-     * @param userId  the user id to include as a claim
-     * @param username the username to include in the token subject
-     * @param roles    the list of roles associated with the user
+     * @param userId      the user id to include as a claim
+     * @param username    the username to include in the token subject
+     * @param roles       the list of roles associated with the user
+     * @param permissions the flattened permission names granted to the user
+     * @param scopes      the scoped role assignments granted to the user
      * @return a signed JWT token as a String
      */
-    public String generateToken(Integer userId, String username, List<Role> roles) {
+    public String generateToken(Integer userId, String username, List<Role> roles,
+                                Set<String> permissions, List<AssignmentDto> scopes) {
         Instant now = Instant.now();
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(Date.from(now))
                 .claim("userId", userId)
                 .claim("roles", roles)
+                .claim("permissions", permissions)
+                .claim("scopes", scopes)
                 .expiration(Date.from(now.plusMillis(expiredTime)))
                 .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)))
                 .compact();

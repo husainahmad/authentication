@@ -22,8 +22,11 @@ public class UserRepositoryAdapter implements UserRepository {
 
     @Override
     public User save(User user) {
-        userMapper.insert(user);
-        // The ID will be populated in the user object by MyBatis after insert
+        if (user.getId() == null) {
+            userMapper.insert(user);
+        } else {
+            userMapper.updateByPrimaryKey(user);
+        }
         return user;
     }
 

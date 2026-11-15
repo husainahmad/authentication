@@ -1,14 +1,18 @@
 package com.harmoni.auth.config;
 
+import com.harmoni.auth.web.filter.HeaderAuthoritiesFilter;
+import com.harmoni.auth.web.filter.JwtAuthoritiesFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Configuration class for Spring Security setup.
@@ -18,6 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
  * </p>
  */
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     /**
@@ -56,11 +61,15 @@ public class SecurityConfig {
      * @throws Exception if an error occurs while building the filter chain
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   JwtAuthoritiesFilter jwtAuthoritiesFilter,
+                                                   HeaderAuthoritiesFilter headerAuthoritiesFilter) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/**").permitAll()
                         .anyRequest().permitAll())
+                .addFilterBefore(headerAuthoritiesFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthoritiesFilter, HeaderAuthoritiesFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }

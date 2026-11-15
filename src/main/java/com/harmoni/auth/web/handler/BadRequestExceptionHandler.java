@@ -62,6 +62,24 @@ public class BadRequestExceptionHandler {
     }
 
     /**
+     * Handles validation failures raised by the application services.
+     *
+     * @param e the exception carrying the validation message
+     * @return a {@link ResponseEntity} with HTTP 400 and the error message
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<CommonDto> illegalArgumentHandler(IllegalArgumentException e) {
+        CommonDto response = CommonDto.builder()
+                .httpStatus(HttpStatus.BAD_REQUEST.value())
+                .timeStamp(System.currentTimeMillis())
+                .error(e.getMessage())
+                .data(null)
+                .build();
+        logAsWarning(e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
      * Handles {@link MissingServletRequestParameterException} by extracting the exception's message.
      *
      * @param e the exception triggered when a required parameter is not provided

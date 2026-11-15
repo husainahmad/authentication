@@ -10,6 +10,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+import java.util.Set;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -19,13 +22,14 @@ public class UserDto {
     @Size(min = 6, max = 125)
     @Pattern(regexp = "^[A-Za-z0-9]+$", message = "{validation.user.username.pattern.NotValid}")
     private String username;
-    @NotBlank(message = "{validation.user.password.NotBlank}")
-    @Size(min = 6, max = 125)
     private String password;
     @NotBlank(message = "{validation.user.email.NotBlank}")
     @Size(min = 2, max = 125)
     @Email(message = "{validation.user.email.NotValid}")
     private String email;
+    private Set<Long> roleIds;
+    private List<AssignmentDto> assignments;
+    private Boolean enabled;
     public User toUser() {
         User user = new User();
         user.setUsername(username);

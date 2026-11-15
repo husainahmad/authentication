@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -29,12 +30,14 @@ public class UserController {
      * @return {@link ResponseEntity} with HTTP 201 status on success
      */
     @PostMapping("")
+    @PreAuthorize("hasAnyAuthority('user:write', 'employee:edit', 'rbac:manage')")
     public ResponseEntity<CommonDto> register(@Valid @RequestBody UserDto userDto) {
         int row = userManagementUseCase.register(userDto);
         log.debug("User Created : {}", row);
 
         CommonDto restAPIResponse = CommonDto.builder()
                 .httpStatus(HttpStatus.CREATED.value())
+                .data(row)
                 .build();
 
         return new ResponseEntity<>(restAPIResponse, HttpStatus.CREATED);
@@ -47,6 +50,7 @@ public class UserController {
      * @return {@link ResponseEntity} with HTTP 200 status on success
      */
     @DeleteMapping("/{username}")
+    @PreAuthorize("hasAnyAuthority('user:delete', 'employee:edit', 'rbac:manage')")
     public ResponseEntity<CommonDto> deactivate(@PathVariable String username) {
         int row = userManagementUseCase.deactivate(username);
         log.debug("User Deactivated : {}", row);
@@ -66,6 +70,7 @@ public class UserController {
      * @return {@link ResponseEntity} with HTTP 200 status on success
      */
     @PutMapping("/{username}")
+    @PreAuthorize("hasAnyAuthority('user:write', 'employee:edit', 'rbac:manage')")
     public ResponseEntity<CommonDto> update(@PathVariable String username, @Valid @RequestBody UserDto userDto) {
         userDto.setUsername(username);
         int row = userManagementUseCase.update(userDto);

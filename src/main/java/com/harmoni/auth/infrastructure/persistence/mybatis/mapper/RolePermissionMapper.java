@@ -26,6 +26,14 @@ public interface RolePermissionMapper {
     int deleteByPrimaryKey(RolePermissionKey key);
 
     /**
+     * Deletes every permission grant for a role.
+     *
+     * @param roleId the role id
+     * @return number of rows affected
+     */
+    int deleteByRoleId(Long roleId);
+
+    /**
      * Inserts a new role-permission mapping.
      *
      * @param row the role-permission key representing the relationship to insert

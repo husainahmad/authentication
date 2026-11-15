@@ -2,7 +2,9 @@ package com.harmoni.auth.infrastructure.persistence.mybatis.mapper;
 
 import com.harmoni.auth.domain.model.UserRoleKey;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -26,12 +28,28 @@ public interface UserRoleMapper {
     int deleteByPrimaryKey(UserRoleKey key);
 
     /**
+     * Deletes every role assignment for a user.
+     *
+     * @param userId the user id
+     * @return number of rows affected
+     */
+    int deleteByUserId(Long userId);
+
+    /**
      * Retrieves all roles assigned to a specific user.
      *
      * @param userId the ID of the user
      * @return a list of {@link UserRoleKey} representing the user's roles
      */
     List<UserRoleKey> selectRolesByUserId(Integer userId);
+
+    /**
+     * Retrieves the assignments for several users in one query.
+     *
+     * @param userIds the user ids
+     * @return the assignments, including role and scope
+     */
+    List<UserRoleKey> selectAssignmentsByUserIds(@Param("userIds") Collection<Long> userIds);
 
     /**
      * Inserts a new user-role mapping into the database.

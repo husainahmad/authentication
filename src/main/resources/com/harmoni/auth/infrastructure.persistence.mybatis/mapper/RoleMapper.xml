@@ -5,10 +5,21 @@
   <resultMap id="BaseResultMap" type="com.harmoni.auth.domain.model.Role">
     <id column="role_id" jdbcType="INTEGER" property="id" />
     <result column="role_name" jdbcType="VARCHAR" property="name" />
+    <result column="role_description" jdbcType="VARCHAR" property="description" />
+    <result column="role_scope_type" jdbcType="VARCHAR" property="scopeType" />
+    <result column="role_code" jdbcType="VARCHAR" property="code" />
+    <result column="role_system" jdbcType="BIT" property="system" />
+    <result column="employee_count" jdbcType="INTEGER" property="employeeCount" />
   </resultMap>
 
   <sql id="Base_Column_List">
-    role.id as role_id, role.name as role_name
+    role.id as role_id,
+    role.name as role_name,
+    role.description as role_description,
+    role.scope_type as role_scope_type,
+    role.code as role_code,
+    role.system as role_system,
+    (select count(distinct ur.user_id) from user_roles ur where ur.role_id = role.id) as employee_count
   </sql>
 
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -49,13 +60,18 @@
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into roles (name)
-    values (#{name,jdbcType=CHAR})
+    insert into roles (name, description, scope_type, code, system)
+    values (#{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR},
+      #{scopeType,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{system,jdbcType=BIT})
   </insert>
 
   <update id="updateByPrimaryKey" parameterType="com.harmoni.auth.domain.model.Role">
     update roles
-    set name = #{name,jdbcType=CHAR}
+    set name = #{name,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      scope_type = #{scopeType,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      system = #{system,jdbcType=BIT}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

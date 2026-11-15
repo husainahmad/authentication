@@ -20,6 +20,14 @@ public interface RoleRepository {
     Role save(Role role);
 
     /**
+     * Updates an existing role.
+     *
+     * @param role the role to update
+     * @return the updated role
+     */
+    Role update(Role role);
+
+    /**
      * Finds a role by their ID.
      *
      * @param id the ID of the role to find

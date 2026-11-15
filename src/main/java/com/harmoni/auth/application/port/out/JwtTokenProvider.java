@@ -1,7 +1,9 @@
 package com.harmoni.auth.application.port.out;
 
 import java.util.List;
+import java.util.Set;
 import com.harmoni.auth.domain.model.Role;
+import com.harmoni.auth.web.dto.AssignmentDto;
 
 /**
  * Port (interface) for JWT token operations.
@@ -12,12 +14,15 @@ public interface JwtTokenProvider {
     /**
      * Generates an access token for the given user with their roles.
      *
-     * @param userId   the user id to embed as a claim
-     * @param username the username to include in the token
-     * @param roles    the roles to include in the token
+     * @param userId      the user id to embed as a claim
+     * @param username    the username to include in the token
+     * @param roles       the roles to include in the token
+     * @param permissions the flattened permission names to include in the token
+     * @param scopes      the scoped role assignments to include in the token
      * @return a signed JWT token
      */
-    String generateToken(Integer userId, String username, List<Role> roles);
+    String generateToken(Integer userId, String username, List<Role> roles,
+                         Set<String> permissions, List<AssignmentDto> scopes);
 
     /**
      * Generates a refresh token for the given user.

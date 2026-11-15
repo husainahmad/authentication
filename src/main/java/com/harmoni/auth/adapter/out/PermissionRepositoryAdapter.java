@@ -27,6 +27,12 @@ public class PermissionRepositoryAdapter implements PermissionRepository {
     }
 
     @Override
+    public Permission update(Permission permission) {
+        permissionMapper.updateByPrimaryKey(permission);
+        return permission;
+    }
+
+    @Override
     public Permission findById(Long id) {
         return permissionMapper.selectByPrimaryKey(id);
     }

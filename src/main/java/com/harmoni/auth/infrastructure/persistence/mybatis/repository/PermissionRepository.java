@@ -20,6 +20,14 @@ public interface PermissionRepository {
     Permission save(Permission permission);
 
     /**
+     * Updates an existing permission.
+     *
+     * @param permission the permission to update
+     * @return the updated permission
+     */
+    Permission update(Permission permission);
+
+    /**
      * Finds a permission by their ID.
      *
      * @param id the ID of the permission to find

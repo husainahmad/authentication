@@ -15,6 +15,11 @@ import java.util.Objects;
 public class Permission {
     private Long id;
     private String name;
+    private String description;
+    private String module;
+    private String action;
+    private String category;
+    private String label;
 
     @Override
     public boolean equals(Object o) {

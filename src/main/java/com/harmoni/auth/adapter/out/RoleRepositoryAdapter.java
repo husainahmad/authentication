@@ -27,6 +27,12 @@ public class RoleRepositoryAdapter implements RoleRepository {
     }
 
     @Override
+    public Role update(Role role) {
+        roleMapper.updateByPrimaryKey(role);
+        return role;
+    }
+
+    @Override
     public Role findById(Long id) {
         return roleMapper.selectByPrimaryKey(id);
     }
