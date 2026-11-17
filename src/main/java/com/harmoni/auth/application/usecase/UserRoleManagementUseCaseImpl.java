@@ -61,6 +61,11 @@ public class UserRoleManagementUseCaseImpl implements UserRoleManagementUseCase 
         auditRecorder.record("ASSIGN_ROLES", "USER", userId, String.valueOf(assignments));
     }
 
+    @Override
+    public List<Long> findUserIds(Integer roleId, String scopeType) {
+        return userRoleRepository.findUserIdsByAssignment(roleId, scopeType);
+    }
+
     private void requireUser(Long userId) {
         if (userId == null || userRepository.findById(userId) == null) {
             throw new IllegalArgumentException("User not found: " + userId);

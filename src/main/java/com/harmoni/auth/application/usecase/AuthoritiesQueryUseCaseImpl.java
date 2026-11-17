@@ -50,11 +50,16 @@ public class AuthoritiesQueryUseCaseImpl implements AuthoritiesQueryUseCase {
         List<UserRoleKey> assignments = userRoleRepository.findAssignmentsByUserId(Long.valueOf(user.getId()));
 
         Set<String> roleNames = new LinkedHashSet<>();
+        Set<String> roleCodes = new LinkedHashSet<>();
         assignments.stream()
                 .map(UserRoleKey::getRole)
                 .filter(Objects::nonNull)
-                .map(Role::getName)
-                .forEach(roleNames::add);
+                .forEach(role -> {
+                    roleNames.add(role.getName());
+                    if (role.getCode() != null) {
+                        roleCodes.add(role.getCode());
+                    }
+                });
 
         Set<Permission> permissions = permissionRepository.findPermissionsByUserId(Long.valueOf(user.getId()));
         Set<String> permissionNames = new LinkedHashSet<>();
@@ -68,6 +73,7 @@ public class AuthoritiesQueryUseCaseImpl implements AuthoritiesQueryUseCase {
                 .userId(user.getId())
                 .username(user.getUsername())
                 .roles(roleNames)
+                .roleCodes(roleCodes)
                 .permissions(permissionNames)
                 .scopes(scopes)
                 .build();

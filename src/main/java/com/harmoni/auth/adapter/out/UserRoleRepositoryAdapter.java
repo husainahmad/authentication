@@ -78,4 +78,9 @@ public class UserRoleRepositoryAdapter implements UserRoleRepository {
                 .forEach(roles::add);
         return roles;
     }
+
+    @Override
+    public List<Long> findUserIdsByAssignment(Integer roleId, String scopeType) {
+        return userRoleMapper.selectUserIds(roleId, scopeType);
+    }
 }

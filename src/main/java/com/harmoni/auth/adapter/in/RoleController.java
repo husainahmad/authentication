@@ -1,6 +1,7 @@
 package com.harmoni.auth.adapter.in;
 
 import com.harmoni.auth.application.port.in.RoleManagementUseCase;
+import com.harmoni.auth.application.usecase.RbacGuard;
 import com.harmoni.auth.web.dto.CommonDto;
 import com.harmoni.auth.web.dto.RoleDto;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,23 @@ public class RoleController {
     @GetMapping
     @PreAuthorize("hasAnyAuthority('rbac:manage', 'rbac:read', 'employee:view')")
     public ResponseEntity<CommonDto> findAll() {
-        return ok(roleManagementUseCase.findAll());
+        return ok(visibleRoles());
+    }
+
+    /**
+     * Hides the platform-only roles from operators who cannot manage them.
+     * The Pemilik role is still enforced server-side when assigning, this only
+     * keeps the picker from offering it.
+     */
+    private java.util.List<RoleDto> visibleRoles() {
+        java.util.List<RoleDto> roles = roleManagementUseCase.findAll();
+        if (RbacGuard.hasRoleCode("SYS")) {
+            return roles;
+        }
+        return roles.stream()
+                .filter(role -> !"OWN".equalsIgnoreCase(role.getCode())
+                        && !"SYS".equalsIgnoreCase(role.getCode()))
+                .toList();
     }
 
     @GetMapping("/{id}")

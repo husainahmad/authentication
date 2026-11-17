@@ -163,10 +163,12 @@ public class HexagonalConfig {
     public UserManagementUseCaseImpl userManagementUseCase(
             UserRepository userRepository,
             UserRoleRepository userRoleRepository,
+            RoleRepository roleRepository,
             RolePermissionRepository rolePermissionRepository,
             PasswordEncoder passwordEncoder) {
         return new UserManagementUseCaseImpl(
-                userRepository, userRoleRepository, rolePermissionRepository, passwordEncoder);
+                userRepository, userRoleRepository, roleRepository,
+                rolePermissionRepository, passwordEncoder);
     }
 
 

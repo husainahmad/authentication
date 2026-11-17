@@ -47,6 +47,35 @@ public final class RbacGuard {
     }
 
     /**
+     * Returns the role names and codes held by the signed-in operator. Both the
+     * gateway's {@code ROLE_<name>} authorities and the JWT filter's
+     * {@code ROLE_<code>} authorities are included.
+     *
+     * @return the role identifiers, never {@code null}
+     */
+    public static Set<String> currentRoles() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return Set.of();
+        }
+        return authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(authority -> authority != null && authority.startsWith("ROLE_"))
+                .map(authority -> authority.substring("ROLE_".length()))
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Whether the signed-in operator holds the given role code, e.g. {@code SYS}.
+     *
+     * @param roleCode the role code
+     * @return {@code true} when granted
+     */
+    public static boolean hasRoleCode(String roleCode) {
+        return roleCode != null && currentRoles().contains(roleCode);
+    }
+
+    /**
      * Rejects the change when the operator tries to grant a permission they do
      * not hold.
      *

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Builds the security context from a signed bearer token.
@@ -70,10 +71,25 @@ public class JwtAuthoritiesFilter extends OncePerRequestFilter {
                     }
                 }
             }
+            Object roles = claims.get("roles");
+            if (roles instanceof Collection<?> values) {
+                for (Object value : values) {
+                    if (value instanceof Map<?, ?> role) {
+                        addRole(authorities, role.get("code"));
+                        addRole(authorities, role.get("name"));
+                    }
+                }
+            }
             SecurityContextHolder.getContext().setAuthentication(
                     new UsernamePasswordAuthenticationToken(username, null, authorities));
         } catch (RuntimeException ex) {
             SecurityContextHolder.clearContext();
+        }
+    }
+
+    private static void addRole(List<GrantedAuthority> authorities, Object role) {
+        if (role != null && !String.valueOf(role).isBlank()) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
         }
     }
 }

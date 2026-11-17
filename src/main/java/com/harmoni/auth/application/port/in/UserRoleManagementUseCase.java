@@ -16,4 +16,6 @@ public interface UserRoleManagementUseCase {
     Map<Long, List<AssignmentDto>> findAssignments(Collection<Long> userIds);
 
     void replaceAssignments(Long userId, List<AssignmentDto> assignments);
+
+    List<Long> findUserIds(Integer roleId, String scopeType);
 }

@@ -1,5 +1,6 @@
 package com.harmoni.auth.application.usecase;
 
+import com.harmoni.auth.domain.model.Role;
 import com.harmoni.auth.domain.model.User;
 import com.harmoni.auth.domain.model.UserRoleKey;
 import com.harmoni.auth.web.dto.AssignmentDto;
@@ -7,8 +8,10 @@ import com.harmoni.auth.web.dto.UserDto;
 import com.harmoni.auth.application.port.in.UserManagementUseCase;
 import com.harmoni.auth.application.port.out.PasswordEncoder;
 import com.harmoni.auth.infrastructure.persistence.mybatis.repository.RolePermissionRepository;
+import com.harmoni.auth.infrastructure.persistence.mybatis.repository.RoleRepository;
 import com.harmoni.auth.infrastructure.persistence.mybatis.repository.UserRepository;
 import com.harmoni.auth.infrastructure.persistence.mybatis.repository.UserRoleRepository;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 
@@ -20,17 +23,26 @@ import java.util.List;
  */
 public class UserManagementUseCaseImpl implements UserManagementUseCase {
 
+    /** Role code of the brand owner; only a system administrator may assign it. */
+    private static final String OWNER_ROLE_CODE = "OWN";
+
+    /** Role code of the platform-level administrator. */
+    private static final String SYSTEM_ADMIN_ROLE_CODE = "SYS";
+
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
+    private final RoleRepository roleRepository;
     private final RolePermissionRepository rolePermissionRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UserManagementUseCaseImpl(UserRepository userRepository,
                                      UserRoleRepository userRoleRepository,
+                                     RoleRepository roleRepository,
                                      RolePermissionRepository rolePermissionRepository,
                                      PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
+        this.roleRepository = roleRepository;
         this.rolePermissionRepository = rolePermissionRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -109,8 +121,7 @@ public class UserManagementUseCaseImpl implements UserManagementUseCase {
         if (userDto.getAssignments() != null) {
             for (AssignmentDto assignment : userDto.getAssignments()) {
                 if (assignment.getRoleId() != null) {
-                    RbacGuard.requireCanAssign(
-                            rolePermissionRepository.findPermissionsByRoleId(assignment.getRoleId()));
+                    requireCanAssign(assignment.getRoleId());
                 }
             }
             return;
@@ -118,9 +129,33 @@ public class UserManagementUseCaseImpl implements UserManagementUseCase {
         if (userDto.getRoleIds() != null) {
             for (Long roleId : userDto.getRoleIds()) {
                 if (roleId != null) {
-                    RbacGuard.requireCanAssign(rolePermissionRepository.findPermissionsByRoleId(roleId));
+                    requireCanAssign(roleId);
                 }
             }
+        }
+    }
+
+    /**
+     * Enforces least privilege on the role being assigned, plus the platform rule
+     * that only a system administrator may create a Pemilik (OWN) user.
+     *
+     * @param roleId the role being assigned
+     */
+    private void requireCanAssign(Long roleId) {
+        RbacGuard.requireCanAssign(rolePermissionRepository.findPermissionsByRoleId(roleId));
+        Role role = roleRepository.findById(roleId);
+        if (role == null || role.getCode() == null) {
+            return;
+        }
+        if (OWNER_ROLE_CODE.equalsIgnoreCase(role.getCode())
+                && !RbacGuard.hasRoleCode(SYSTEM_ADMIN_ROLE_CODE)) {
+            throw new AccessDeniedException(
+                    "Only a system administrator can create a Pemilik user");
+        }
+        if (SYSTEM_ADMIN_ROLE_CODE.equalsIgnoreCase(role.getCode())
+                && !RbacGuard.hasRoleCode(SYSTEM_ADMIN_ROLE_CODE)) {
+            throw new AccessDeniedException(
+                    "Only a system administrator can assign the System Administrator role");
         }
     }
 

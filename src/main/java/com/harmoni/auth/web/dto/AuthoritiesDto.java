@@ -20,6 +20,7 @@ public class AuthoritiesDto {
     private Integer userId;
     private String username;
     private Set<String> roles;
+    private Set<String> roleCodes;
     private Set<String> permissions;
     private List<AssignmentDto> scopes;
 }

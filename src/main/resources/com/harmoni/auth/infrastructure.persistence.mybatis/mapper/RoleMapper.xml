@@ -3,7 +3,7 @@
 <mapper namespace="com.harmoni.auth.infrastructure.persistence.mybatis.mapper.RoleMapper">
 
   <resultMap id="BaseResultMap" type="com.harmoni.auth.domain.model.Role">
-    <id column="role_id" jdbcType="INTEGER" property="id" />
+    <id column="role_id" jdbcType="BIGINT" property="id" />
     <result column="role_name" jdbcType="VARCHAR" property="name" />
     <result column="role_description" jdbcType="VARCHAR" property="description" />
     <result column="role_scope_type" jdbcType="VARCHAR" property="scopeType" />
@@ -18,15 +18,15 @@
     role.description as role_description,
     role.scope_type as role_scope_type,
     role.code as role_code,
-    role.system as role_system,
+    role.`system` as role_system,
     (select count(distinct ur.user_id) from user_roles ur where ur.role_id = role.id) as employee_count
   </sql>
 
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from roles role
-    where role.id = #{id,jdbcType=INTEGER}
+    where role.id = #{id,jdbcType=BIGINT}
   </select>
 
   <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
@@ -51,16 +51,16 @@
     )
   </select>
 
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from roles
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </delete>
 
   <insert id="insert" parameterType="com.harmoni.auth.domain.model.Role">
-    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into roles (name, description, scope_type, code, system)
+    insert into roles (name, description, scope_type, code, `system`)
     values (#{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR},
       #{scopeType,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{system,jdbcType=BIT})
   </insert>
@@ -71,7 +71,7 @@
       description = #{description,jdbcType=VARCHAR},
       scope_type = #{scopeType,jdbcType=VARCHAR},
       code = #{code,jdbcType=VARCHAR},
-      system = #{system,jdbcType=BIT}
-    where id = #{id,jdbcType=INTEGER}
+      `system` = #{system,jdbcType=BIT}
+    where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

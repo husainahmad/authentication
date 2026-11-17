@@ -62,4 +62,13 @@ public interface UserRoleRepository {
      * @return the assigned roles
      */
     Set<Role> findRolesByUserId(Long userId);
+
+    /**
+     * Finds the auth user ids that have an assignment matching the filters.
+     *
+     * @param roleId    optional role id
+     * @param scopeType optional scope type
+     * @return the matching user ids
+     */
+    List<Long> findUserIdsByAssignment(Integer roleId, String scopeType);
 }

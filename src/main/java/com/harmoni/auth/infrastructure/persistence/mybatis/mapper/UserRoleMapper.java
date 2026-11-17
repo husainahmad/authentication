@@ -52,6 +52,15 @@ public interface UserRoleMapper {
     List<UserRoleKey> selectAssignmentsByUserIds(@Param("userIds") Collection<Long> userIds);
 
     /**
+     * Finds the auth user ids with an assignment matching the given filters.
+     *
+     * @param roleId    optional role id
+     * @param scopeType optional scope type
+     * @return the matching user ids
+     */
+    List<Long> selectUserIds(@Param("roleId") Integer roleId, @Param("scopeType") String scopeType);
+
+    /**
      * Inserts a new user-role mapping into the database.
      *
      * @param row the user-role key to insert

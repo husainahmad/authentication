@@ -28,6 +28,14 @@ public class UserRoleController {
         return ok(userRoleManagementUseCase.findAssignments(userId));
     }
 
+    @GetMapping("/users/ids")
+    @PreAuthorize("hasAnyAuthority('employee:view', 'rbac:manage', 'user:read')")
+    public ResponseEntity<CommonDto> findUserIds(
+            @RequestParam(name = "roleId", required = false) Integer roleId,
+            @RequestParam(name = "scopeType", required = false) String scopeType) {
+        return ok(userRoleManagementUseCase.findUserIds(roleId, scopeType));
+    }
+
     @PutMapping("/users/{userId}/assignments")
     @PreAuthorize("hasAnyAuthority('employee:edit', 'rbac:manage', 'user:write')")
     public ResponseEntity<CommonDto> replaceAssignments(@PathVariable Long userId,
